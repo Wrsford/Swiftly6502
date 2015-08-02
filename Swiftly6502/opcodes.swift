@@ -368,7 +368,9 @@ class instruction {
 	var opc, bytes: Int
 	var cycles: Int
 	var arg = 0
-	var groupIndex = -1
+	var groupIndex = InstructionGroups.NOP
+	var qAddressing = AddressingModes.Invalid
+	
 	init(addressing: String,
 		assembler: String,
 		description: String,
@@ -382,6 +384,8 @@ class instruction {
 			self.opc = opc
 			self.bytes = bytes
 			self.cycles = cycles
+			self.groupIndex = iGroups[self.assembler]!
+			self.qAddressing = qAddressingTable[self.addressing]!
 	}
 	
 	func printOverview() {
@@ -403,32 +407,19 @@ class instruction {
 	}
 	
 	static func instrWith(name: String, addressing: String) -> instruction? {
-		let gIdx = groups[name]
+		
+		let gIdx = iGroups[name]
 		
 		if gIdx == nil {
 			return nil
 		}
 		
 		for i in instructionSet {
-			if i.gIdx == gIdx && i.addressing == addressing {
+			if i.groupIndex == gIdx && i.addressing == addressing {
 				return i
 			}
 		}
 		return Optional.None
-	}
-	
-	static func assignGroupIndexes() {
-		var count = 0
-		for i in instructionSet {
-			if groups[i.assembler] != nil {
-				i.groupIndex = groups[i.assembler]!
-			} else {
-				groups[i.assembler] = count
-				count++
-				i.groupIndex = groups[i.assembler]!
-			}
-		}
-		
 	}
 	
 }
@@ -460,22 +451,41 @@ func instrForString(parsable: String) -> instruction {
 	return instruction(addressing: addressing, assembler: assembler, description: description, opc: opc!, bytes: bytes!, cycles: Int(cycles.replace("*", newText: ""))!)
 }
 
-let qAddressingTable = [
-	"accumulator" : 0x01,
-	"absolute" : 0x02,
-	"absolute,X" : 0x03,
-	"absolute,Y" : 0x04,
-	"immediate" : 0x05,
-	"implied" : 0x05,
-	"indirect" : 0x05,
-	"(indirect,X)" : 0x05,
-	"(indirect),Y" : 0x05,
-	"relative" : 0x05,
-	"zeropage" : 0x05,
-	"zeropage,X" : 0x05,
-	"zeropage,Y" : 0x05
+enum AddressingModes {
+	case Accumulator
+	case Absolute
+	case AbsoluteX
+	case AbsoluteY
+	case Immediate
+	case Implied
+	case Indirect
+	case IndirectX
+	case IndirectY
+	case Relative
+	case Zeropage
+	case ZeropageX
+	case ZeropageY
+	case Invalid
+}
+
+let qAddressingTable = [ // Quick lookup table
+	"accumulator"	: AddressingModes.Accumulator,
+	"absolute"		: AddressingModes.Absolute,
+	"absolute,X"	: AddressingModes.AbsoluteX,
+	"absolute,Y"	: AddressingModes.AbsoluteY,
+	"immediate"		: AddressingModes.Immediate,
+	"implied"		: AddressingModes.Implied,
+	"indirect"		: AddressingModes.Indirect,
+	"(indirect,X)"	: AddressingModes.IndirectX,
+	"(indirect),Y"	: AddressingModes.IndirectY,
+	"relative"		: AddressingModes.Relative,
+	"zeropage"		: AddressingModes.Zeropage,
+	"zeropage,X"	: AddressingModes.ZeropageX,
+	"zeropage,Y"	: AddressingModes.ZeropageY
 
 ]
+
+
 
 let argDict = [
 	"accumulator" : "OPC A",
@@ -492,6 +502,130 @@ let argDict = [
 	"zeropage,X" : "OPC $LL,X",
 	"zeropage,Y" : "OPC $LL,Y"
 ]
+
+enum InstructionGroups {
+	case ADC
+	case AND
+	case ASL
+	case BCC
+	case BCS
+	case BEQ
+	case BIT
+	case BMI
+	case BNE
+	case BPL
+	case BRK
+	case BVC
+	case BVS
+	case CLC
+	case CLD
+	case CLI
+	case CLV
+	case CMP
+	case CPX
+	case CPY
+	case DEC
+	case DEX
+	case DEY
+	case EOR
+	case INC
+	case INX
+	case INY
+	case JMP
+	case JSR
+	case LDA
+	case LDX
+	case LDY
+	case LSR
+	case NOP
+	case ORA
+	case PHA
+	case PHP
+	case PLA
+	case PLP
+	case ROL
+	case ROR
+	case RTI
+	case RTS
+	case SBC
+	case SEC
+	case SED
+	case SEI
+	case STA
+	case STX
+	case STY
+	case TAX
+	case TAY
+	case TSX
+	case TXA
+	case TXS
+	case TYA
+	
+	case SLP
+}
+
+let iGroups = [
+	"ADC" : InstructionGroups.ADC,
+	"AND" : InstructionGroups.AND,
+	"ASL" : InstructionGroups.ASL,
+	"BCC" : InstructionGroups.BCC,
+	"BCS" : InstructionGroups.BCS,
+	"BEQ" : InstructionGroups.BEQ,
+	"BIT" : InstructionGroups.BIT,
+	"BMI" : InstructionGroups.BMI,
+	"BNE" : InstructionGroups.BNE,
+	"BPL" : InstructionGroups.BPL,
+	"BRK" : InstructionGroups.BRK,
+	"BVC" : InstructionGroups.BVC,
+	"BVS" : InstructionGroups.BVS,
+	"CLC" : InstructionGroups.CLC,
+	"CLD" : InstructionGroups.CLD,
+	"CLI" : InstructionGroups.CLI,
+	"CLV" : InstructionGroups.CLV,
+	"CMP" : InstructionGroups.CMP,
+	"CPX" : InstructionGroups.CPX,
+	"CPY" : InstructionGroups.CPY,
+	"DEC" : InstructionGroups.DEC,
+	"DEX" : InstructionGroups.DEX,
+	"DEY" : InstructionGroups.DEY,
+	"EOR" : InstructionGroups.EOR,
+	"INC" : InstructionGroups.INC,
+	"INX" : InstructionGroups.INX,
+	"INY" : InstructionGroups.INY,
+	"JMP" : InstructionGroups.JMP,
+	"JSR" : InstructionGroups.JSR,
+	"LDA" : InstructionGroups.LDA,
+	"LDX" : InstructionGroups.LDX,
+	"LDY" : InstructionGroups.LDY,
+	"LSR" : InstructionGroups.LSR,
+	"NOP" : InstructionGroups.NOP,
+	"ORA" : InstructionGroups.ORA,
+	"PHA" : InstructionGroups.PHA,
+	"PHP" : InstructionGroups.PHP,
+	"PLA" : InstructionGroups.PLA,
+	"PLP" : InstructionGroups.PLP,
+	"ROL" : InstructionGroups.ROL,
+	"ROR" : InstructionGroups.ROR,
+	"RTI" : InstructionGroups.RTI,
+	"RTS" : InstructionGroups.RTS,
+	"SBC" : InstructionGroups.SBC,
+	"SEC" : InstructionGroups.SEC,
+	"SED" : InstructionGroups.SED,
+	"SEI" : InstructionGroups.SEI,
+	"STA" : InstructionGroups.STA,
+	"STX" : InstructionGroups.STX,
+	"STY" : InstructionGroups.STY,
+	"TAX" : InstructionGroups.TAX,
+	"TAY" : InstructionGroups.TAY,
+	"TSX" : InstructionGroups.TSX,
+	"TXA" : InstructionGroups.TXA,
+	"TXS" : InstructionGroups.TXS,
+	"TYA" : InstructionGroups.TYA,
+	
+	"SLP" : InstructionGroups.SLP
+
+]
+
 
 
 let instructionSet = [
@@ -648,7 +782,14 @@ let instructionSet = [
 	instrForString("implied       TSX           BA    1     2"),
 	instrForString("implied       TXA           8A    1     2"),
 	instrForString("implied       TXS           9A    1     2"),
-	instrForString("implied       TYA           98    1     2")]
+	instrForString("implied       TYA           98    1     2"),
+	
+	// Custom
+	instrForString("immediate     SLP #oper     100   2     1") // Sleep(tenth of seconds)
+
+
+
+]
 
 
 

@@ -261,8 +261,13 @@ sta (snakeHeadL,x) ; erase end of tail
 rts
 
 
-spinWheels: ; Modified for sleep command
-slp #$01
+spinWheels:
+ldx #0
+spinloop:
+nop
+nop
+dex
+bne spinloop
 rts
 
 

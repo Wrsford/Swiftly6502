@@ -34,8 +34,9 @@
 		FCE6DB601B6C75F200AEE730 /* eram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = eram.swift; sourceTree = "<group>"; };
 		FCE6DB611B6C75F200AEE730 /* opcodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = opcodes.swift; sourceTree = "<group>"; };
 		FCE6DB621B6C75F200AEE730 /* scpu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = scpu.swift; sourceTree = "<group>"; };
-		FCE6DB631B6C75F200AEE730 /* test.6502 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.6502; sourceTree = "<group>"; };
+		FCE6DB631B6C75F200AEE730 /* test.6502 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.6502; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.asm.arm; };
 		FCE6DB6A1B6D282400AEE730 /* egpu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = egpu.swift; sourceTree = "<group>"; };
+		FCE6DB6C1B6EC13F00AEE730 /* snake.s */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = snake.s; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +78,7 @@
 				FCE6DB621B6C75F200AEE730 /* scpu.swift */,
 				FCE6DB6A1B6D282400AEE730 /* egpu.swift */,
 				FCE6DB631B6C75F200AEE730 /* test.6502 */,
+				FCE6DB6C1B6EC13F00AEE730 /* snake.s */,
 				FCE6DB501B6C75E200AEE730 /* Main.storyboard */,
 				FCE6DB531B6C75E200AEE730 /* Assets.xcassets */,
 				FCE6DB551B6C75E200AEE730 /* LaunchScreen.storyboard */,
@@ -280,7 +282,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iwillsecurity.Swiftly6502;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_DISABLE_SAFETY_CHECKS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Debug;
 		};
@@ -292,7 +295,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iwillsecurity.Swiftly6502;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_DISABLE_SAFETY_CHECKS = YES;
+				SWIFT_DISABLE_SAFETY_CHECKS = NO;
 			};
 			name = Release;
 		};
