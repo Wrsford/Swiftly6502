@@ -12,6 +12,13 @@
 		FCE6DB521B6C75E200AEE730 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FCE6DB501B6C75E200AEE730 /* Main.storyboard */; };
 		FCE6DB541B6C75E200AEE730 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCE6DB531B6C75E200AEE730 /* Assets.xcassets */; };
 		FCE6DB571B6C75E200AEE730 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FCE6DB551B6C75E200AEE730 /* LaunchScreen.storyboard */; };
+		FCE6DB641B6C75F200AEE730 /* assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB5E1B6C75F200AEE730 /* assembler.swift */; };
+		FCE6DB651B6C75F200AEE730 /* disassembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB5F1B6C75F200AEE730 /* disassembler.swift */; };
+		FCE6DB661B6C75F200AEE730 /* eram.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB601B6C75F200AEE730 /* eram.swift */; };
+		FCE6DB671B6C75F200AEE730 /* opcodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB611B6C75F200AEE730 /* opcodes.swift */; };
+		FCE6DB681B6C75F200AEE730 /* scpu.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB621B6C75F200AEE730 /* scpu.swift */; };
+		FCE6DB691B6C75F200AEE730 /* test.6502 in Resources */ = {isa = PBXBuildFile; fileRef = FCE6DB631B6C75F200AEE730 /* test.6502 */; };
+		FCE6DB6B1B6D282400AEE730 /* egpu.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB6A1B6D282400AEE730 /* egpu.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +29,13 @@
 		FCE6DB531B6C75E200AEE730 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FCE6DB561B6C75E200AEE730 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FCE6DB581B6C75E200AEE730 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FCE6DB5E1B6C75F200AEE730 /* assembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = assembler.swift; sourceTree = "<group>"; };
+		FCE6DB5F1B6C75F200AEE730 /* disassembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = disassembler.swift; sourceTree = "<group>"; };
+		FCE6DB601B6C75F200AEE730 /* eram.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = eram.swift; sourceTree = "<group>"; };
+		FCE6DB611B6C75F200AEE730 /* opcodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = opcodes.swift; sourceTree = "<group>"; };
+		FCE6DB621B6C75F200AEE730 /* scpu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = scpu.swift; sourceTree = "<group>"; };
+		FCE6DB631B6C75F200AEE730 /* test.6502 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.6502; sourceTree = "<group>"; };
+		FCE6DB6A1B6D282400AEE730 /* egpu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = egpu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +70,13 @@
 			children = (
 				FCE6DB4C1B6C75E200AEE730 /* AppDelegate.swift */,
 				FCE6DB4E1B6C75E200AEE730 /* ViewController.swift */,
+				FCE6DB5E1B6C75F200AEE730 /* assembler.swift */,
+				FCE6DB5F1B6C75F200AEE730 /* disassembler.swift */,
+				FCE6DB601B6C75F200AEE730 /* eram.swift */,
+				FCE6DB611B6C75F200AEE730 /* opcodes.swift */,
+				FCE6DB621B6C75F200AEE730 /* scpu.swift */,
+				FCE6DB6A1B6D282400AEE730 /* egpu.swift */,
+				FCE6DB631B6C75F200AEE730 /* test.6502 */,
 				FCE6DB501B6C75E200AEE730 /* Main.storyboard */,
 				FCE6DB531B6C75E200AEE730 /* Assets.xcassets */,
 				FCE6DB551B6C75E200AEE730 /* LaunchScreen.storyboard */,
@@ -121,6 +142,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCE6DB691B6C75F200AEE730 /* test.6502 in Resources */,
 				FCE6DB571B6C75E200AEE730 /* LaunchScreen.storyboard in Resources */,
 				FCE6DB541B6C75E200AEE730 /* Assets.xcassets in Resources */,
 				FCE6DB521B6C75E200AEE730 /* Main.storyboard in Resources */,
@@ -135,7 +157,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCE6DB4F1B6C75E200AEE730 /* ViewController.swift in Sources */,
+				FCE6DB671B6C75F200AEE730 /* opcodes.swift in Sources */,
+				FCE6DB661B6C75F200AEE730 /* eram.swift in Sources */,
+				FCE6DB641B6C75F200AEE730 /* assembler.swift in Sources */,
 				FCE6DB4D1B6C75E200AEE730 /* AppDelegate.swift in Sources */,
+				FCE6DB681B6C75F200AEE730 /* scpu.swift in Sources */,
+				FCE6DB6B1B6D282400AEE730 /* egpu.swift in Sources */,
+				FCE6DB651B6C75F200AEE730 /* disassembler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +280,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iwillsecurity.Swiftly6502;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 			};
 			name = Debug;
 		};
@@ -263,6 +292,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.iwillsecurity.Swiftly6502;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 			};
 			name = Release;
 		};
