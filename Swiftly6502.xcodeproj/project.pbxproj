@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FC8C92A11BBB127800CB3FE3 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = FC8C92A01BBB127800CB3FE3 /* README.md */; settings = {ASSET_TAGS = (); }; };
 		FCE6DB4D1B6C75E200AEE730 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB4C1B6C75E200AEE730 /* AppDelegate.swift */; };
 		FCE6DB4F1B6C75E200AEE730 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE6DB4E1B6C75E200AEE730 /* ViewController.swift */; };
 		FCE6DB521B6C75E200AEE730 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FCE6DB501B6C75E200AEE730 /* Main.storyboard */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FC8C92A01BBB127800CB3FE3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FCE6DB491B6C75E200AEE730 /* Swiftly6502.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swiftly6502.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCE6DB4C1B6C75E200AEE730 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FCE6DB4E1B6C75E200AEE730 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 		FCE6DB401B6C75E200AEE730 = {
 			isa = PBXGroup;
 			children = (
+				FC8C92A01BBB127800CB3FE3 /* README.md */,
 				FCE6DB4B1B6C75E200AEE730 /* Swiftly6502 */,
 				FCE6DB4A1B6C75E200AEE730 /* Products */,
 			);
@@ -165,6 +168,7 @@
 				FCE6DB641B6C75F200AEE730 /* assembler.swift in Sources */,
 				FCE6DB4D1B6C75E200AEE730 /* AppDelegate.swift in Sources */,
 				FCE6DB681B6C75F200AEE730 /* scpu.swift in Sources */,
+				FC8C92A11BBB127800CB3FE3 /* README.md in Sources */,
 				FCE6DB6B1B6D282400AEE730 /* egpu.swift in Sources */,
 				FCE6DB651B6C75F200AEE730 /* disassembler.swift in Sources */,
 			);
