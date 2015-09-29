@@ -11,11 +11,18 @@ import Foundation
 class eram {
 	var name : String?
 	var graphicsCallbacks = [Any]()
+	
+	var gpu = egpu()
+	
+	var vramLocation = 0x200
+	var vramSize: Int
+	
 	private var memory : [Int]
 	
 	init(theName: String = "Emulated Ram") {
 		name = theName
 		memory = [Int](count: 0xFFFF, repeatedValue: 0) // Memory is 64KB
+		vramSize = gpu.screenHeight * gpu.screenWidth
 	}
 	
 	var stack = [Int](count: 256, repeatedValue: 0)
@@ -33,11 +40,10 @@ class eram {
 			return memory[address]
 		}
 		set(value) {
-			
 			memory[address] = value
 			
 			if graphicsCallbacks.count != 0 {
-				if address > 0x1ff && address < 0x600 {
+				
 					//print("Modifying pixel: \(")
 					for g in graphicsCallbacks {
 						(g as! (Int) -> Void)(0x200)
@@ -47,4 +53,3 @@ class eram {
 			
 		}
 	}
-}

@@ -95,13 +95,13 @@ extension String {
 	func substringToIndex(index: Int) -> String {
 		return String((self as NSString).substringToIndex(index))
 	}
+    
+    func join(theStrings: [String]) -> String {
+        return theStrings.joinWithSeparator(self)
+    }
 	
-	func rangeFromNSRange(nsRange : NSRange) -> Range<String.Index>? {
-		if let from = String.Index(self.utf16.startIndex + nsRange.location, within: self),
-			let to = String.Index(self.utf16.startIndex + nsRange.location + nsRange.length, within: self) {
-				return from ..< to
-		}
-		return nil
+	func rangeFromNSRange(nsRange : NSRange) -> Range<Int>? {
+        return nsRange.toRange()
 	}
 }
 
@@ -295,7 +295,7 @@ class scpu {
 		let asmbr = assembler()
 		let binary = asmbr.assemble(filestuff, offset: binaryOffset)
 		for i in binary {
-			print(i.hex(2) + " ", appendNewline: false)
+            print(i.hex(2) + " ", terminator: "")
 		}
 		
 		ram.loadData(binary, startAddress: binaryOffset)

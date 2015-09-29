@@ -7,26 +7,37 @@
 //
 
 import Foundation
+struct Pixel6502 {
+	var a = 255
+	var r: Int
+	var g: Int
+	var b: Int
+}
 
-var palette = [
-	"000000", "ffffff", "880000", "aaffee",
-	"cc44cc", "00cc55", "0000aa", "eeee77",
-	"dd8855", "664400", "ff7777", "333333",
-	"777777", "aaff66", "0088ff", "bbbbbb"
+let palette = [
+	[0x00, 0x00, 0x00], [0xff, 0xff, 0xff], [0x88, 0x00, 0x00], [0xaa, 0xff, 0xee],
+	[0xcc, 0x44, 0xcc], [0x00, 0xcc, 0x55], [0x00, 0x00, 0xaa], [0xee, 0xee, 0x77],
+	[0xdd, 0x88, 0x55], [0x66, 0x44, 0x00], [0xff, 0x77, 0x77], [0x33, 0x33, 0x33],
+	[0x77, 0x77, 0x77], [0xaa, 0xff, 0x66], [0x00, 0x88, 0xff], [0xbb, 0xbb, 0xbb]
 ]
 
 func getRGBFor6502(color: Int) -> (r: UInt8, g: UInt8, b: UInt8) {
-	
-	
-	let base = Int(palette[color & 0x0f], radix: 16)!
-	
-	let r = (base >> 16) & 0xff
-	let g = (base >> 8) & 0xff
-	let b = (base) & 0xff
+	let r = palette[color & 0x0f][0] & 0xff
+	let g = palette[color & 0x0f][1] & 0xff
+	let b = palette[color & 0x0f][2] & 0xff
 	
 	return (UInt8(r), UInt8(g), UInt8(b))
 }
 
 class egpu {
+	//var vram = [Int]()
+	var screenHeight = 32
+	var screenWidth = 32
+	var bitsPerPixel = 8
 	
+	
+	
+	/*func pixelAtIndex(index: Int) -> Pixel6502 {
+		let color = getRGBFor6502(ram[index+])
+	}*/
 }

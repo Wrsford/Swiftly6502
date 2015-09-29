@@ -12,6 +12,7 @@ func disassemble(data: [Int]) -> String {
 	var currentAddr = 0
 	var toReturn = ""
 	while currentAddr < data.count {
+		
 		let theInstr = instruction.instrWithOPC(data[currentAddr])
 		
 		
@@ -36,11 +37,14 @@ func disassemble(data: [Int]) -> String {
 			}
 			
 			toReturn += theLine + "\n"
+			currentAddr += theInstr!.bytes
 		} else {
-			toReturn += "ERROR DECOMPILING\n"
+			toReturn += ".byte $" + data[currentAddr].hex() + "\n"
+			//print("ERROR DECOMPILING")
+			currentAddr++
 		}
 		
-		currentAddr += theInstr!.bytes
+		
 	}
 	
 	return toReturn
