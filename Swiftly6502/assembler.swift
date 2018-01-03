@@ -28,58 +28,55 @@ class assembler {
 		rawCode = ""
 	}
 	
-	private func isPreprocessor(line: String) -> Bool {
+	fileprivate func isPreprocessor(_ line: String) -> Bool {
 		//let keywords = [ "define" : ]
 		return line.remove6502CompilerExcess().startsWith("DEFINE")
 	}
 	
-	private func preprocess(code: String) -> String {
+	fileprivate func preprocess(_ code: String) -> String {
 		var defines = [String : Int]()
 		
-		var lines = code.componentsSeparatedByString("\n")
+		var lines = code.components(separatedBy: "\n")
 		
-		for (var i = 0; i < lines.count; i++) {
-			lines[i] = lines[i].remove6502CompilerExcess()
-			var theLine = lines[i]
-			if isPreprocessor(theLine) {
-				theLine = theLine.substringFromIndex("DEFINE".length()).remove6502CompilerExcess()
-				
-				let rangeOfEq = theLine.rangeOfString("[[:space:]]", options: NSStringCompareOptions.RegularExpressionSearch, range: theLine.rangeOfString(theLine), locale: nil)
-				if rangeOfEq != nil {
-					let theDefinedString = theLine.substringToIndex(rangeOfEq!.startIndex).remove6502CompilerExcess()
-					// ALRIGHTY FUCKHEAD. I GOT UR GODDAMNED STRING
-					
-					var theStringValue = theLine.substringFromIndex(rangeOfEq!.endIndex).remove6502CompilerExcess()
-					
-					var theValue: Int?
-					
-					if theStringValue.rangeOfString("$") != nil {
-						theStringValue = theStringValue.replace("$", newText: "")
-						theValue = Int(theStringValue, radix: 16)
-					}
-					
-					else {
-						theValue = Int(theStringValue)
-					}
-					
-					if theValue != nil {
-						defines[theDefinedString] = theValue!
-					}
-					
-					else {
-						print("FUCK U ASSHOLE UR DEFINE IS SHIT")
-					}
-					
-				}
-				
-				lines.removeAtIndex(i)
-				i--
-			}
-		}
+        var i = 0
+        while  i < lines.count {
+            lines[i] = lines[i].remove6502CompilerExcess()
+            var theLine = lines[i]
+            if isPreprocessor(theLine) {
+                theLine = theLine.substringFromIndex("DEFINE".length()).remove6502CompilerExcess()
+                
+                let rangeOfEq = theLine.range(of: "[[:space:]]", options: NSString.CompareOptions.regularExpression, range: theLine.range(of: theLine), locale: nil)
+                if rangeOfEq != nil {
+                    let theDefinedString = theLine.substring(to: rangeOfEq!.lowerBound).remove6502CompilerExcess()
+                    // ALRIGHTY FUCKHEAD. I GOT UR GODDAMNED STRING
+                    
+                    var theStringValue = theLine.substring(from: rangeOfEq!.upperBound).remove6502CompilerExcess()
+                    
+                    var theValue: Int?
+                    
+                    if theStringValue.range(of: "$") != nil {
+                        theStringValue = theStringValue.replace("$", newText: "")
+                        theValue = Int(theStringValue, radix: 16)
+                    } else {
+                        theValue = Int(theStringValue)
+                    }
+                    
+                    if theValue != nil {
+                        defines[theDefinedString] = theValue!
+                    } else {
+                        print("Error: theValue is nil, no definition possible")
+                    }
+                }
+                
+                lines.remove(at: i)
+                continue    // line removed, therefore not incrementing i
+            }
+            i += 1
+        }
 		
 		var preprocessedCode = "\n".join(lines)
 		
-		let sortedKeys = defines.keys.sort({ return $0.length() > $1.length() })
+		let sortedKeys = defines.keys.sorted(by: { return $0.length() > $1.length() })
 		
 		print(sortedKeys)
 		
@@ -90,67 +87,66 @@ class assembler {
 		return preprocessedCode
 	}
 	
-	func assemble(code: String, offset startAddr: Int) -> [Int] {
-		rawCode = self.preprocess(code.uppercaseString)
-		var lines = rawCode.componentsSeparatedByString("\n")
+	func assemble(_ code: String, offset startAddr: Int) -> [Int] {
+		rawCode = self.preprocess(code.uppercased())
+		var lines = rawCode.components(separatedBy: "\n")
 		var binary = [Int]()
 		
 		var labels = [String : asmLabel]()
 		
 		// Find all the labels first
-		for (var i = 0; i < lines.count; i++) {
+		for i in 0 ..< lines.count {
 			let cleanLine = lines[i].remove6502CompilerExcess()
 			
 			if cleanLine.endsWith(":") {
 				// This is a label
-				let theLabl = (cleanLine as NSString).substringToIndex(cleanLine.length()-1)
+				let theLabl = (cleanLine as NSString).substring(to: cleanLine.length()-1)
 				labels[theLabl] = asmLabel(name: theLabl)
 				print("Label: " + theLabl)
 			}
 		}
 		
 		// Convert all non-hex to hex
-		for (var i = 0; i < lines.count; i++) {
+        var i = 0
+		while i < lines.count {
 			let l = lines[i].remove6502CompilerExcess()
 			if l == "RTS" {
-				print("there he is")
+				print("reached RTS")
 			}
-			if l.length() < 3{
-				lines.removeAtIndex(i)
-				i--
-				continue
+			if l.length() < 3 {
+				lines.remove(at: i)
+				continue    // line removed, therefore not incrementing i
 			}
 			
-			if l.rangeOfString("$") == nil {
+			if l.range(of: "$") == nil {
 				// Replace the cmd code with blankness
-				let matchRange = ("   " + l.substringFromIndex(3)).rangeOfString("[0-9]{1,}", options: NSStringCompareOptions.RegularExpressionSearch, range: l.rangeOfString(l), locale: nil)
+				let matchRange = ("   " + l.substringFromIndex(3)).range(of: "[0-9]{1,}", options: NSString.CompareOptions.regularExpression, range: l.range(of: l), locale: nil)
 				if matchRange != nil {
-					let theNum = Int(l.substringWithRange(matchRange!))
+					let theNum = Int(l.substring(with: matchRange!))
 					
 					if theNum != nil {
-						lines.insert(l.stringByReplacingCharactersInRange(matchRange!, withString: "$" + theNum!.hex()), atIndex: i)
-						lines.removeAtIndex(i+1)
+						lines.insert(l.replacingCharacters(in: matchRange!, with: "$" + theNum!.hex()), at: i)
+						lines.remove(at: i+1)
+					}
+					
+				}
+			} else {
+				let matchRange = ("   " + l.substringFromIndex(3)).range(of: "[0-9a-fA-F]{1,}", options: NSString.CompareOptions.regularExpression, range: l.range(of: l), locale: nil)
+				if matchRange != nil {
+					let theNum = Int(l.substring(with: matchRange!), radix:16)
+					
+					if theNum != nil {
+						lines.insert(l.replacingCharacters(in: matchRange!, with: theNum!.hex()), at: i)
+						lines.remove(at: i+1)
 					}
 					
 				}
 			}
-			
-			else {
-				let matchRange = ("   " + l.substringFromIndex(3)).rangeOfString("[0-9a-fA-F]{1,}", options: NSStringCompareOptions.RegularExpressionSearch, range: l.rangeOfString(l), locale: nil)
-				if matchRange != nil {
-					let theNum = Int(l.substringWithRange(matchRange!), radix:16)
-					
-					if theNum != nil {
-						lines.insert(l.stringByReplacingCharactersInRange(matchRange!, withString: theNum!.hex()), atIndex: i)
-						lines.removeAtIndex(i+1)
-					}
-					
-				}
-			}
+            i += 1
 		}
 		print("\n".join(lines))
 		
-		for (var lnum = 0; lnum < lines.count; lnum++) {
+		for lnum in 0 ..< lines.count {
 			
 			// Clear out comments and whitespace
 			let cleanLine = lines[lnum].remove6502CompilerExcess()
@@ -215,7 +211,7 @@ class assembler {
 			while possibles.count == 0 {
 				for (key, value) in regexDict {
 					let pred = NSPredicate(format: "SELF MATCHES %@", value)
-					if pred.evaluateWithObject(lineToParse.uppercaseString) {
+					if pred.evaluate(with: lineToParse.uppercased()) {
 						// Predicate matches
 						possibles.append(key)
 					}
@@ -270,12 +266,12 @@ class assembler {
 					let orderedSearcher = ["HH", "LL", "BB"]
 					
 					for ser in orderedSearcher {
-						let range  = argDict[i]!.rangeOfString(ser)
+						let range  = argDict[i]!.range(of: ser)
 						
 						if range != nil {
 							var nextByte: Int
-							nextByte = Int(lineToParse.substringWithRange(range!), radix:16)!							
-							binary.insert(nextByte, atIndex: insPnt-startAddr)
+							nextByte = Int(lineToParse.substring(with: range!), radix:16)!							
+							binary.insert(nextByte, at: insPnt-startAddr)
 						}
 					}
 					

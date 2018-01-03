@@ -21,7 +21,7 @@ let palette = [
 	[0x77, 0x77, 0x77], [0xaa, 0xff, 0x66], [0x00, 0x88, 0xff], [0xbb, 0xbb, 0xbb]
 ]
 
-func getRGBFor6502(color: Int) -> (r: UInt8, g: UInt8, b: UInt8) {
+func getRGBFor6502(_ color: Int) -> (r: UInt8, g: UInt8, b: UInt8) {
 	let r = palette[color & 0x0f][0] & 0xff
 	let g = palette[color & 0x0f][1] & 0xff
 	let b = palette[color & 0x0f][2] & 0xff

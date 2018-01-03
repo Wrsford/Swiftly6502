@@ -8,14 +8,14 @@
 
 import Foundation
 
-func hex(num: Int) -> String {
+func hex(_ num: Int) -> String {
 	return String(num, radix: 16)
 }
 
 extension Int {
 	
-	func hex(places: Int) -> String {
-		return (NSString(format: "%0\(places)x", self) as String)
+	func hex(_ places: Int) -> String {
+		return (NSString(format: "%0\(places)x" as NSString, self) as String)
 	}
 	
 	func hex() -> String { // Use for bytes
@@ -41,30 +41,30 @@ extension Int {
 
 extension String {
 	func removeExcessWhiteSpace() -> String {
-		return self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+		return self.trimmingCharacters(in: CharacterSet.whitespaces)
 	}
 	
-	func removeComments(commentString: String) -> String {
-		let range = self.rangeOfString(commentString)
+	func removeComments(_ commentString: String) -> String {
+		let range = self.range(of: commentString)
 		if range != nil {
-			return self.substringToIndex(range!.startIndex)
+			return self.substring(to: range!.lowerBound)
 		}
 		return self
 	}
 	
 	func remove6502CompilerExcess() -> String {
-		return self.removeComments(";").removeExcessWhiteSpace().uppercaseString
+		return self.removeComments(";").removeExcessWhiteSpace().uppercased()
 	}
 	
 	func length() -> Int {
-		return self.characters.count
+		return self.count
 	}
 	
-	func endsWith(suffix: String) -> Bool {
-		let range = self.rangeOfString(suffix)
+	func endsWith(_ suffix: String) -> Bool {
+		let range = self.range(of: suffix)
 		
 		if range != nil {
-			if range!.endIndex == self.endIndex {
+			if range!.upperBound == self.endIndex {
 				return true
 			}
 		}
@@ -72,15 +72,15 @@ extension String {
 		return false
 	}
 	
-	func replace(expr: String, newText: String) -> String {
-		return self.stringByReplacingOccurrencesOfString(expr, withString: newText)
+	func replace(_ expr: String, newText: String) -> String {
+		return self.replacingOccurrences(of: expr, with: newText)
 	}
 	
-	func startsWith(prefix: String) -> Bool {
-		let range = self.rangeOfString(prefix)
+	func startsWith(_ prefix: String) -> Bool {
+		let range = self.range(of: prefix)
 		
 		if range != nil {
-			if range!.startIndex == self.startIndex {
+			if range!.lowerBound == self.startIndex {
 				return true
 			}
 		}
@@ -88,21 +88,18 @@ extension String {
 		return false
 	}
 	
-	func substringFromIndex(index: Int) -> String {
-		return String((self as NSString).substringFromIndex(index))
+	func substringFromIndex(_ index: Int) -> String {
+		return String((self as NSString).substring(from: index))
 	}
 	
-	func substringToIndex(index: Int) -> String {
-		return String((self as NSString).substringToIndex(index))
+	func substringToIndex(_ index: Int) -> String {
+		return String((self as NSString).substring(to: index))
 	}
     
-    func join(theStrings: [String]) -> String {
-        return theStrings.joinWithSeparator(self)
+    func join(_ theStrings: [String]) -> String {
+        return theStrings.joined(separator: self)
     }
 	
-	func rangeFromNSRange(nsRange : NSRange) -> Range<Int>? {
-        return nsRange.toRange()
-	}
 }
 
 class StatusRegister {
@@ -211,10 +208,10 @@ class scpu {
 		return description;
 	}
 	
-	func inputKey(key: String) {
+	func inputKey(_ key: String) {
 		let sysLastKey = 0xff
 		
-		ram[sysLastKey] = Int((key as NSString).characterAtIndex(0))
+		ram[sysLastKey] = Int((key as NSString).character(at: 0))
 	}
 	
 	func run() {
@@ -229,7 +226,7 @@ class scpu {
 			//1.023mhz
 			//let startTime = NSDate()
 			
-			ram[sysRandomAddr] = random() & 0x00FF
+			ram[sysRandomAddr] = Int(arc4random() & 0x00FF)
 			let findOP = instruction.instrWithOPC(ram[PC])
 			
 			if findOP != nil {
@@ -238,8 +235,8 @@ class scpu {
 				let op = findOP!
 				
 				// Find args
-				var args = [Int](count: 2, repeatedValue: 0)
-				for (var i = 1; i < op.bytes; i++) {
+				var args = [Int](repeating: 0, count: 2)
+				for i in 1..<op.bytes {
 					args[i-1] = ram[PC+i]
 				}
 				
@@ -257,7 +254,7 @@ class scpu {
 		
 	}
 	
-	func run(offset: Int) {
+	func run(_ offset: Int) {
 		PC = offset
 		run()
 	}
@@ -303,9 +300,7 @@ class scpu {
 		run()
 		
 		print(description())
-		
-		return
-		
+				
 		print("\n\nDisassembly:")
 		print(disassemble(binary))
 		print("\n\n\n\n")
@@ -332,15 +327,15 @@ class scpu {
 			0xea, 0xca, 0xd0, 0xfb, 0x60 ]))
 	}
 	
-	func push(stackPointer: Int, val: Int) {
+	func push(_ stackPointer: Int, val: Int) {
 		ram.stack[stackPointer] = val
 	}
 	
-	func pull(stackPointer: Int) -> Int {
+	func pull(_ stackPointer: Int) -> Int {
 		return ram.stack[stackPointer]
 	}
 	
-	func bcd(num: Int) -> Int {
+	func bcd(_ num: Int) -> Int {
 		let hi = (((num & 0x00FF00) >> 8) % 9) * 10
 		let lo = ((num & 0x0000FF) % 9)
 		return hi + lo
@@ -351,7 +346,7 @@ class scpu {
 		var value = 0
 	}
 	
-	func executeOp(op: instruction) {
+	func executeOp(_ op: instruction) {
 		var rawArg = operand()
 		var accum = false
 		
@@ -378,41 +373,41 @@ class scpu {
 		}
 		
 		switch op.qAddressing {
-		case AddressingModes.Accumulator:
+		case AddressingModes.accumulator:
 			M = A
 			accum = true
 			
-		case AddressingModes.Absolute:
+		case AddressingModes.absolute:
 			M = op.arg
 			rawArg.isAddress = true
 			
-		case AddressingModes.AbsoluteX:
+		case AddressingModes.absoluteX:
 			M = op.arg + X
 			rawArg.isAddress = true
 		
-		case AddressingModes.AbsoluteY:
+		case AddressingModes.absoluteY:
 			M = op.arg + Y
 			rawArg.isAddress = true
 		
-		case AddressingModes.Immediate:
+		case AddressingModes.immediate:
 			M = op.arg
 			
-		case AddressingModes.Implied:
+		case AddressingModes.implied:
 			M = 0 // No arg
 		
-		case AddressingModes.Indirect:
+		case AddressingModes.indirect:
 			M = ((ram[op.arg+1] << 8) & 0x00ff00) | ram[op.arg]
 			rawArg.isAddress = true
 			
-		case AddressingModes.IndirectX:
+		case AddressingModes.indirectX:
 			M = ((ram[op.arg+1+X] << 8) & 0x00ff00) | ram[op.arg+X]
 			rawArg.isAddress = true
 		
-		case AddressingModes.IndirectY:
+		case AddressingModes.indirectY:
 			M = (((ram[op.arg+1] << 8) & 0x00ff00) | ram[op.arg]) + Y
 			rawArg.isAddress = true
 		
-		case AddressingModes.Relative:
+		case AddressingModes.relative:
 			if (op.arg[7] == 1) {
 				// Negative
 				M = PC - (~op.arg & 0x00ff) - 1
@@ -420,15 +415,15 @@ class scpu {
 				M = PC + op.arg
 			}
 		
-		case AddressingModes.Zeropage:
+		case AddressingModes.zeropage:
 			M = op.arg
 			rawArg.isAddress = true
 		
-		case AddressingModes.ZeropageX:
+		case AddressingModes.zeropageX:
 			M = (op.arg + X) & 0x00ff
 			rawArg.isAddress = true
 		
-		case AddressingModes.ZeropageY:
+		case AddressingModes.zeropageY:
 			M = (op.arg + Y) & 0x00ff
 			rawArg.isAddress = true
 			
@@ -440,7 +435,7 @@ class scpu {
 		
 		switch op.groupIndex {
 			
-		case InstructionGroups.ADC: // ADC
+		case InstructionGroups.adc: // ADC
 			//print("ADC")
 			t = A + M + P.C
 			
@@ -456,63 +451,63 @@ class scpu {
 			}
 			A = t & 0xFF
 			
-		case InstructionGroups.AND: // AND
+		case InstructionGroups.and: // AND
 			//print("AND")
 			A = A & M
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.ASL: // ASL
+		case InstructionGroups.asl: // ASL
 			//print("ASL")
 			P.C = M[7]
 			M = (M << 1) & 0x00FE
 			P.N = M[7]
 			P.Z = (M == 0) ? 1:0
 			
-		case InstructionGroups.BCC: // BCC
+		case InstructionGroups.bcc: // BCC
 			//print("BCC")
 			if (P.C == 0) {
 				PC = M
 			}
 			
-		case InstructionGroups.BCS: // BCS
+		case InstructionGroups.bcs: // BCS
 			//print("BCS")
 			if (P.C == 1) {
 				PC = M
 			}
 			
-		case InstructionGroups.BEQ: // BEQ
+		case InstructionGroups.beq: // BEQ
 			//print("BEQ")
 			if (P.Z == 1) {
 				PC = M
 			}
 			
-		case InstructionGroups.BIT: // BIT
+		case InstructionGroups.bit: // BIT
 			//print("BIT")
 			t = A & M
 			P.N = t[7]
 			P.V = t[6]
 			P.Z = (t == 0) ? 1:0
 			
-		case InstructionGroups.BMI: // BMI
+		case InstructionGroups.bmi: // BMI
 			//print("BMI")
 			if (P.N == 1) {
 				PC = M
 			}
 			
-		case InstructionGroups.BNE: // BNE
+		case InstructionGroups.bne: // BNE
 			//print("BNE")
 			if (P.Z == 0) {
 				PC = M
 			}
 			
-		case InstructionGroups.BPL: // BPL
+		case InstructionGroups.bpl: // BPL
 			//print("BPL")
 			if (P.N == 0) {
 				PC = M
 			}
 			
-		case InstructionGroups.BRK: // BRK
+		case InstructionGroups.brk: // BRK
 			//print("BRK") // Unclear. Do this later
 			/*PC = PC + 1
 			push(SP, val: (PC & 0x00FF00) >> 8)
@@ -526,102 +521,102 @@ class scpu {
 			PC = h|l*/
 			codeRunning = false
 			
-		case InstructionGroups.BVC: // BVC
+		case InstructionGroups.bvc: // BVC
 			//print("BVC")
 			if (P.V == 0) {
 				PC = M
 			}
 			
-		case InstructionGroups.BVS: // BVC
+		case InstructionGroups.bvs: // BVC
 			//print("BVS")
 			if (P.V == 1) {
 				PC = M
 			}
 			
-		case InstructionGroups.CLC: // CLC
+		case InstructionGroups.clc: // CLC
 			//print("CLC")
 			P.C = 0
 			
-		case InstructionGroups.CLD: // CLD
+		case InstructionGroups.cld: // CLD
 			//print("CLD")
 			P.D = 0
 			
-		case InstructionGroups.CLI: // CLI
+		case InstructionGroups.cli: // CLI
 			//print("CLI")
 			P.I = 0
 			
-		case InstructionGroups.CLV: // CLV
+		case InstructionGroups.clv: // CLV
 			//print("CLV")
 			P.V = 0
 			
-		case InstructionGroups.CMP: // CMP
+		case InstructionGroups.cmp: // CMP
 			//print("CMP")
 			t = A - M
 			P.N = t[7]
 			P.C = (A>=M) ? 1:0
 			P.Z = (t==0) ? 1:0
 			
-		case InstructionGroups.CPX: // CPX
+		case InstructionGroups.cpx: // CPX
 			//print("CPX")
 			t = X - M
 			P.N = t[7]
 			P.C = (X>=M) ? 1:0
 			P.Z = (t==0) ? 1:0
 			
-		case InstructionGroups.CPY: // CPY
+		case InstructionGroups.cpy: // CPY
 			//print("CPY")
 			t = Y - M
 			P.N = t[7]
 			P.C = (Y>=M) ? 1:0
 			P.Z = (t==0) ? 1:0
 			
-		case InstructionGroups.DEC: // DEC
+		case InstructionGroups.dec: // DEC
 			//print("DEC")
 			M = (M - 1) & 0x00FF
 			P.N = M[7]
 			P.Z = (M==0) ? 1:0
 			
-		case InstructionGroups.DEX: // DEX
+		case InstructionGroups.dex: // DEX
 			//print("DEX")
 			X = X - 1
 			P.Z = (X==0) ? 1:0
 			P.N = X[7]
 			
-		case InstructionGroups.DEY: // DEX
+		case InstructionGroups.dey: // DEX
 			//print("DEY")
 			Y = Y - 1
 			P.Z = (Y==0) ? 1:0
 			P.N = Y[7]
 			
-		case InstructionGroups.EOR: // EOR
+		case InstructionGroups.eor: // EOR
 			//print("EOR")
 			A = A ^ M
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.INC: // INC
+		case InstructionGroups.inc: // INC
 			//print("INC")
 			M = (M + 1) & 0x00FF
 			P.N = M[7]
 			P.Z = (M==0) ? 1:0
 			
-		case InstructionGroups.INX: // INX
+		case InstructionGroups.inx: // INX
 			//print("INX")
 			X = X + 1
 			P.Z = (X==0) ? 1:0
 			P.N = X[7]
 			
-		case InstructionGroups.INY: // INY
+		case InstructionGroups.iny: // INY
 			//print("INY")
 			Y = Y + 1
 			P.Z = (Y==0) ? 1:0
 			P.N = Y[7]
 			
-		case InstructionGroups.JMP: // JMP
+		case InstructionGroups.jmp: // JMP
 			//print("JMP")
 			PC = rawArg.value
 			
-		case InstructionGroups.JSR: // JSR
+		case InstructionGroups.jsr: // JSR
 			//print("JSR") // More stack shit
 			t = PC - 1
 			push(SP, val: (t & 0x00FF00) >> 8)
@@ -630,63 +625,63 @@ class scpu {
 			SP = SP - 1
 			PC = rawArg.value
 			
-		case InstructionGroups.LDA: // LDA
+		case InstructionGroups.lda: // LDA
 			//print("LDA")
 			A = M
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.LDX: // LDX
+		case InstructionGroups.ldx: // LDX
 			//print("LDX")
 			X = M
 			P.N = X[7]
 			P.Z = (X==0) ? 1:0
 			
-		case InstructionGroups.LDY: // LDY
+		case InstructionGroups.ldy: // LDY
 			//print("LDY")
 			Y = M
 			P.N = Y[7]
 			P.Z = (Y==0) ? 1:0
 			
-		case InstructionGroups.LSR: // LSR
+		case InstructionGroups.lsr: // LSR
 			//print("LSR")
 			P.N = 0
 			P.C = M[0]
 			M = (M >> 1) & 0x007F
 			P.Z = (M==0) ? 1:0
 			
-		case InstructionGroups.NOP: // NOP
+		case InstructionGroups.nop: // NOP
 			true
 			
-		case InstructionGroups.ORA: // ORA
+		case InstructionGroups.ora: // ORA
 			//print("ORA")
 			A = A | M
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.PHA: // PHA
+		case InstructionGroups.pha: // PHA
 			//print("PHA")
 			push(SP, val: A)
 			SP = SP - 1
 			
-		case InstructionGroups.PHP: // PHP
+		case InstructionGroups.php: // PHP
 			//print("PHP")
 			push(SP, val: P.value)
 			SP = SP - 1
 			
-		case InstructionGroups.PLA: // PLA
+		case InstructionGroups.pla: // PLA
 			//print("PLA")
 			SP = SP + 1
 			A = pull(SP)
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.PLP: // PLA
+		case InstructionGroups.plp: // PLA
 			//print("PLP")
 			SP = SP + 1
 			P.value = pull(SP)
 			
-		case InstructionGroups.ROL: // ROL
+		case InstructionGroups.rol: // ROL
 			//print("ROL")
 			t = M[7]
 			M = (M << 1) & 0x00FE
@@ -695,7 +690,7 @@ class scpu {
 			P.Z = (M==0) ? 1:0
 			P.N = M[7]
 			
-		case InstructionGroups.ROR: // ROR
+		case InstructionGroups.ror: // ROR
 			//print("ROR")
 			t = M[0]
 			M = (M >> 1) & 0x007F
@@ -704,7 +699,7 @@ class scpu {
 			P.Z = (M==0) ? 1:0
 			P.N = M[7]
 			
-		case InstructionGroups.RTI: // RTI
+		case InstructionGroups.rti: // RTI
 			//print("RTI")
 			SP = SP - 1
 			P.value = pull(SP)
@@ -714,7 +709,7 @@ class scpu {
 			let h = pull(SP)<<8
 			PC = h|l
 			
-		case InstructionGroups.RTS: // RTS
+		case InstructionGroups.rts: // RTS
 			//print("RTS")
 			SP = SP + 1
 			let l = pull(SP)
@@ -722,7 +717,7 @@ class scpu {
 			let h = pull(SP)<<8
 			PC = (h|l) + 1
 			
-		case InstructionGroups.SBC: // SBC
+		case InstructionGroups.sbc: // SBC
 			//print("SBC")
 			if (P.D == 1) {
 				t = bcd(A) - bcd(M) - (P.C == 1 ? 0 : 1)
@@ -738,65 +733,65 @@ class scpu {
 			P.Z = (t==0) ? 1:0
 			A = t & 0xFF
 			
-		case InstructionGroups.SEC: // SEC
+		case InstructionGroups.sec: // SEC
 			//print("SEC")
 			P.C = 1
 			
-		case InstructionGroups.SED: // SED
+		case InstructionGroups.sed: // SED
 			//print("SED")
 			P.D = 1
 			
-		case InstructionGroups.SEI: // SEI
+		case InstructionGroups.sei: // SEI
 			//print("SEI")
 			P.I = 1
 			
-		case InstructionGroups.STA: // STA
+		case InstructionGroups.sta: // STA
 			//print("STA") // Lets rethink memory
 			M = A
 			
-		case InstructionGroups.STX: // STX
+		case InstructionGroups.stx: // STX
 			//print("STX")
 			M = X
 			
-		case InstructionGroups.STY: // STY
+		case InstructionGroups.sty: // STY
 			//print("STY")
 			M = Y
 			
-		case InstructionGroups.TAX: // TAX
+		case InstructionGroups.tax: // TAX
 			//print("TAX")
 			X = A
 			P.N = X[7]
 			P.Z = (X==0) ? 1:0
 			
-		case InstructionGroups.TAY: // TAY
+		case InstructionGroups.tay: // TAY
 			//print("TAY")
 			Y = A
 			P.N = Y[7]
 			P.Z = (Y==0) ? 1:0
 			
-		case InstructionGroups.TSX: // TSX
+		case InstructionGroups.tsx: // TSX
 			//print("TSX")
 			X = SP
 			P.N = X[7]
 			P.Z = (X==0) ? 1:0
 			
-		case InstructionGroups.TXA: // TXA
+		case InstructionGroups.txa: // TXA
 			//print("TXA")
 			A = X
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.TXS: // TXS
+		case InstructionGroups.txs: // TXS
 			//print("TXS")
 			SP = X
 			
-		case InstructionGroups.TYA: // TYA
+		case InstructionGroups.tya: // TYA
 			//print("TYA")
 			A = Y
 			P.N = A[7]
 			P.Z = (A==0) ? 1:0
 			
-		case InstructionGroups.SLP: // SLP
+		case InstructionGroups.slp: // SLP
 			usleep(useconds_t(M * 100000))
 			
 		default:

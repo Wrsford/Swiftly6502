@@ -305,8 +305,8 @@ class opcode {
 	init(HI theHI: Int, LO theLO: Int, name theName: String) {
 		self.HI = UInt8(theHI)
 		self.LO = UInt8(theLO)
-		self.name = theName.componentsSeparatedByString(" ")[0]
-		self.argType = theName.componentsSeparatedByString(" ")[1]
+		self.name = theName.components(separatedBy: " ")[0]
+		self.argType = theName.components(separatedBy: " ")[1]
 		self.argCount = (argType != "impl") ? 1 : 0
 	}
 	
@@ -336,10 +336,10 @@ class opcode {
 func buildOps() -> [opcode] {
 	var theCodes = [opcode]()
 	
-	for (var i = 0; i < rawCodes.count; i++) {
+	for i in 0 ..< rawCodes.count {
 		let codeGroup = rawCodes[i]
 		let hiNibble : Int? = Int(codeGroup[0], radix: 16)
-		for (var j = 1; j < codeGroup.count; j++) {
+		for j in 1 ..< codeGroup.count {
 			theCodes.append(opcode(HI: hiNibble!, LO: j-1, name: codeGroup[j]))
 		}
 	}
@@ -349,8 +349,8 @@ func buildOps() -> [opcode] {
 
 let opcodes = buildOps()
 
-func opForCode(HILO: UInt8) -> opcode? {
-	for (var i = 0; i < opcodes.count; i++) {
+func opForCode(_ HILO: UInt8) -> opcode? {
+	for i in 0 ..< opcodes.count {
 		if (opcodes[i].HILO == HILO) {
 			return opcodes[i]
 		}
@@ -368,8 +368,8 @@ class instruction {
 	var opc, bytes: Int
 	var cycles: Int
 	var arg = 0
-	var groupIndex = InstructionGroups.NOP
-	var qAddressing = AddressingModes.Invalid
+	var groupIndex = InstructionGroups.nop
+	var qAddressing = AddressingModes.invalid
 	
 	init(addressing: String,
 		assembler: String,
@@ -397,16 +397,16 @@ class instruction {
 		print("")
 	}
 	
-	static func instrWithOPC(opc: Int) -> instruction? {
+	static func instrWithOPC(_ opc: Int) -> instruction? {
 		for i in instructionSet {
 			if i.opc == opc {
 				return i
 			}
 		}
-		return Optional.None
+		return Optional.none
 	}
 	
-	static func instrWith(name: String, addressing: String) -> instruction? {
+	static func instrWith(_ name: String, addressing: String) -> instruction? {
 		
 		let gIdx = iGroups[name]
 		
@@ -419,12 +419,12 @@ class instruction {
 				return i
 			}
 		}
-		return Optional.None
+		return Optional.none
 	}
 	
 }
 
-func instrForString(parsable: String) -> instruction {
+func instrForString(_ parsable: String) -> instruction {
 	// 0
 	// 14
 	// 14
@@ -432,19 +432,19 @@ func instrForString(parsable: String) -> instruction {
 	// 6
 	var fuckSwift: NSString = parsable as NSString
 	
-	let addressing = fuckSwift.substringToIndex(14).stringByReplacingOccurrencesOfString(" ", withString: "")
-	fuckSwift = fuckSwift.substringFromIndex(14)
+	let addressing = fuckSwift.substring(to: 14).replacingOccurrences(of: " ", with: "")
+	fuckSwift = fuckSwift.substring(from: 14) as NSString
 	
-	let description = fuckSwift.substringToIndex(14)
-	let assembler = fuckSwift.substringToIndex(3)
+	let description = fuckSwift.substring(to: 14)
+	let assembler = fuckSwift.substring(to: 3)
 	
-	fuckSwift = fuckSwift.substringFromIndex(14)
+	fuckSwift = fuckSwift.substring(from: 14) as NSString
 	
-	let opc = Int(fuckSwift.substringToIndex(6).stringByReplacingOccurrencesOfString(" ", withString: "") as String, radix: 16)
-	fuckSwift = fuckSwift.substringFromIndex(6)
+	let opc = Int(fuckSwift.substring(to: 6).replacingOccurrences(of: " ", with: "") as String, radix: 16)
+	fuckSwift = fuckSwift.substring(from: 6) as NSString
 	
-	let bytes = Int(fuckSwift.substringToIndex(6).stringByReplacingOccurrencesOfString(" ", withString: ""))
-	fuckSwift = fuckSwift.substringFromIndex(6)
+	let bytes = Int(fuckSwift.substring(to: 6).replacingOccurrences(of: " ", with: ""))
+	fuckSwift = fuckSwift.substring(from: 6) as NSString
 	
 	let cycles = fuckSwift as String
 	
@@ -452,36 +452,36 @@ func instrForString(parsable: String) -> instruction {
 }
 
 enum AddressingModes {
-	case Accumulator
-	case Absolute
-	case AbsoluteX
-	case AbsoluteY
-	case Immediate
-	case Implied
-	case Indirect
-	case IndirectX
-	case IndirectY
-	case Relative
-	case Zeropage
-	case ZeropageX
-	case ZeropageY
-	case Invalid
+	case accumulator
+	case absolute
+	case absoluteX
+	case absoluteY
+	case immediate
+	case implied
+	case indirect
+	case indirectX
+	case indirectY
+	case relative
+	case zeropage
+	case zeropageX
+	case zeropageY
+	case invalid
 }
 
 let qAddressingTable = [ // Quick lookup table
-	"accumulator"	: AddressingModes.Accumulator,
-	"absolute"		: AddressingModes.Absolute,
-	"absolute,X"	: AddressingModes.AbsoluteX,
-	"absolute,Y"	: AddressingModes.AbsoluteY,
-	"immediate"		: AddressingModes.Immediate,
-	"implied"		: AddressingModes.Implied,
-	"indirect"		: AddressingModes.Indirect,
-	"(indirect,X)"	: AddressingModes.IndirectX,
-	"(indirect),Y"	: AddressingModes.IndirectY,
-	"relative"		: AddressingModes.Relative,
-	"zeropage"		: AddressingModes.Zeropage,
-	"zeropage,X"	: AddressingModes.ZeropageX,
-	"zeropage,Y"	: AddressingModes.ZeropageY
+	"accumulator"	: AddressingModes.accumulator,
+	"absolute"		: AddressingModes.absolute,
+	"absolute,X"	: AddressingModes.absoluteX,
+	"absolute,Y"	: AddressingModes.absoluteY,
+	"immediate"		: AddressingModes.immediate,
+	"implied"		: AddressingModes.implied,
+	"indirect"		: AddressingModes.indirect,
+	"(indirect,X)"	: AddressingModes.indirectX,
+	"(indirect),Y"	: AddressingModes.indirectY,
+	"relative"		: AddressingModes.relative,
+	"zeropage"		: AddressingModes.zeropage,
+	"zeropage,X"	: AddressingModes.zeropageX,
+	"zeropage,Y"	: AddressingModes.zeropageY
 
 ]
 
@@ -504,125 +504,125 @@ let argDict = [
 ]
 
 enum InstructionGroups {
-	case ADC
-	case AND
-	case ASL
-	case BCC
-	case BCS
-	case BEQ
-	case BIT
-	case BMI
-	case BNE
-	case BPL
-	case BRK
-	case BVC
-	case BVS
-	case CLC
-	case CLD
-	case CLI
-	case CLV
-	case CMP
-	case CPX
-	case CPY
-	case DEC
-	case DEX
-	case DEY
-	case EOR
-	case INC
-	case INX
-	case INY
-	case JMP
-	case JSR
-	case LDA
-	case LDX
-	case LDY
-	case LSR
-	case NOP
-	case ORA
-	case PHA
-	case PHP
-	case PLA
-	case PLP
-	case ROL
-	case ROR
-	case RTI
-	case RTS
-	case SBC
-	case SEC
-	case SED
-	case SEI
-	case STA
-	case STX
-	case STY
-	case TAX
-	case TAY
-	case TSX
-	case TXA
-	case TXS
-	case TYA
+	case adc
+	case and
+	case asl
+	case bcc
+	case bcs
+	case beq
+	case bit
+	case bmi
+	case bne
+	case bpl
+	case brk
+	case bvc
+	case bvs
+	case clc
+	case cld
+	case cli
+	case clv
+	case cmp
+	case cpx
+	case cpy
+	case dec
+	case dex
+	case dey
+	case eor
+	case inc
+	case inx
+	case iny
+	case jmp
+	case jsr
+	case lda
+	case ldx
+	case ldy
+	case lsr
+	case nop
+	case ora
+	case pha
+	case php
+	case pla
+	case plp
+	case rol
+	case ror
+	case rti
+	case rts
+	case sbc
+	case sec
+	case sed
+	case sei
+	case sta
+	case stx
+	case sty
+	case tax
+	case tay
+	case tsx
+	case txa
+	case txs
+	case tya
 	
-	case SLP
+	case slp
 }
 
 let iGroups = [
-	"ADC" : InstructionGroups.ADC,
-	"AND" : InstructionGroups.AND,
-	"ASL" : InstructionGroups.ASL,
-	"BCC" : InstructionGroups.BCC,
-	"BCS" : InstructionGroups.BCS,
-	"BEQ" : InstructionGroups.BEQ,
-	"BIT" : InstructionGroups.BIT,
-	"BMI" : InstructionGroups.BMI,
-	"BNE" : InstructionGroups.BNE,
-	"BPL" : InstructionGroups.BPL,
-	"BRK" : InstructionGroups.BRK,
-	"BVC" : InstructionGroups.BVC,
-	"BVS" : InstructionGroups.BVS,
-	"CLC" : InstructionGroups.CLC,
-	"CLD" : InstructionGroups.CLD,
-	"CLI" : InstructionGroups.CLI,
-	"CLV" : InstructionGroups.CLV,
-	"CMP" : InstructionGroups.CMP,
-	"CPX" : InstructionGroups.CPX,
-	"CPY" : InstructionGroups.CPY,
-	"DEC" : InstructionGroups.DEC,
-	"DEX" : InstructionGroups.DEX,
-	"DEY" : InstructionGroups.DEY,
-	"EOR" : InstructionGroups.EOR,
-	"INC" : InstructionGroups.INC,
-	"INX" : InstructionGroups.INX,
-	"INY" : InstructionGroups.INY,
-	"JMP" : InstructionGroups.JMP,
-	"JSR" : InstructionGroups.JSR,
-	"LDA" : InstructionGroups.LDA,
-	"LDX" : InstructionGroups.LDX,
-	"LDY" : InstructionGroups.LDY,
-	"LSR" : InstructionGroups.LSR,
-	"NOP" : InstructionGroups.NOP,
-	"ORA" : InstructionGroups.ORA,
-	"PHA" : InstructionGroups.PHA,
-	"PHP" : InstructionGroups.PHP,
-	"PLA" : InstructionGroups.PLA,
-	"PLP" : InstructionGroups.PLP,
-	"ROL" : InstructionGroups.ROL,
-	"ROR" : InstructionGroups.ROR,
-	"RTI" : InstructionGroups.RTI,
-	"RTS" : InstructionGroups.RTS,
-	"SBC" : InstructionGroups.SBC,
-	"SEC" : InstructionGroups.SEC,
-	"SED" : InstructionGroups.SED,
-	"SEI" : InstructionGroups.SEI,
-	"STA" : InstructionGroups.STA,
-	"STX" : InstructionGroups.STX,
-	"STY" : InstructionGroups.STY,
-	"TAX" : InstructionGroups.TAX,
-	"TAY" : InstructionGroups.TAY,
-	"TSX" : InstructionGroups.TSX,
-	"TXA" : InstructionGroups.TXA,
-	"TXS" : InstructionGroups.TXS,
-	"TYA" : InstructionGroups.TYA,
+	"ADC" : InstructionGroups.adc,
+	"AND" : InstructionGroups.and,
+	"ASL" : InstructionGroups.asl,
+	"BCC" : InstructionGroups.bcc,
+	"BCS" : InstructionGroups.bcs,
+	"BEQ" : InstructionGroups.beq,
+	"BIT" : InstructionGroups.bit,
+	"BMI" : InstructionGroups.bmi,
+	"BNE" : InstructionGroups.bne,
+	"BPL" : InstructionGroups.bpl,
+	"BRK" : InstructionGroups.brk,
+	"BVC" : InstructionGroups.bvc,
+	"BVS" : InstructionGroups.bvs,
+	"CLC" : InstructionGroups.clc,
+	"CLD" : InstructionGroups.cld,
+	"CLI" : InstructionGroups.cli,
+	"CLV" : InstructionGroups.clv,
+	"CMP" : InstructionGroups.cmp,
+	"CPX" : InstructionGroups.cpx,
+	"CPY" : InstructionGroups.cpy,
+	"DEC" : InstructionGroups.dec,
+	"DEX" : InstructionGroups.dex,
+	"DEY" : InstructionGroups.dey,
+	"EOR" : InstructionGroups.eor,
+	"INC" : InstructionGroups.inc,
+	"INX" : InstructionGroups.inx,
+	"INY" : InstructionGroups.iny,
+	"JMP" : InstructionGroups.jmp,
+	"JSR" : InstructionGroups.jsr,
+	"LDA" : InstructionGroups.lda,
+	"LDX" : InstructionGroups.ldx,
+	"LDY" : InstructionGroups.ldy,
+	"LSR" : InstructionGroups.lsr,
+	"NOP" : InstructionGroups.nop,
+	"ORA" : InstructionGroups.ora,
+	"PHA" : InstructionGroups.pha,
+	"PHP" : InstructionGroups.php,
+	"PLA" : InstructionGroups.pla,
+	"PLP" : InstructionGroups.plp,
+	"ROL" : InstructionGroups.rol,
+	"ROR" : InstructionGroups.ror,
+	"RTI" : InstructionGroups.rti,
+	"RTS" : InstructionGroups.rts,
+	"SBC" : InstructionGroups.sbc,
+	"SEC" : InstructionGroups.sec,
+	"SED" : InstructionGroups.sed,
+	"SEI" : InstructionGroups.sei,
+	"STA" : InstructionGroups.sta,
+	"STX" : InstructionGroups.stx,
+	"STY" : InstructionGroups.sty,
+	"TAX" : InstructionGroups.tax,
+	"TAY" : InstructionGroups.tay,
+	"TSX" : InstructionGroups.tsx,
+	"TXA" : InstructionGroups.txa,
+	"TXS" : InstructionGroups.txs,
+	"TYA" : InstructionGroups.tya,
 	
-	"SLP" : InstructionGroups.SLP
+	"SLP" : InstructionGroups.slp
 
 ]
 

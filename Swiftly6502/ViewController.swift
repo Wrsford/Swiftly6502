@@ -28,7 +28,7 @@ class ViewController: UIViewController {
 	var cpu6502 = scpu()
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		screenView.layer.borderColor = UIColor(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0).CGColor
+		screenView.layer.borderColor = UIColor(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0).cgColor
 		screenView.layer.borderWidth = 2.0
 		
 		/*let data = NSData.dataWithContentsOfMappedFile("/Users/wrsford/Downloads/Metroid Source Code/MetroidBrinstarPage.o")!
@@ -54,7 +54,7 @@ class ViewController: UIViewController {
 		// Dispose of any resources that can be recreated.
 		
 	}
-	@IBAction func startCpu(sender: AnyObject) {
+	@IBAction func startCpu(_ sender: AnyObject) {
 		cpu6502 = scpu()
 		
 		cpu6502.ram.graphicsCallbacks.append(updateScreen)
@@ -62,7 +62,7 @@ class ViewController: UIViewController {
 		//let documentsPath = String(NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as NSString)
 		var filestuff: String
 		do {
-			try filestuff = String(contentsOfFile: NSBundle.mainBundle().pathForResource("test", ofType: "6502")!)
+			try filestuff = String(contentsOfFile: Bundle.main.path(forResource: "test", ofType: "6502")!)
 			
 		} catch {
 			filestuff = ""
@@ -73,62 +73,58 @@ class ViewController: UIViewController {
 		let binary = asmbr.assemble(filestuff, offset: cpu6502.binaryOffset)
 		cpu6502.ram.loadData(binary, startAddress: cpu6502.binaryOffset)
 		
-		let qualityOfServiceClass = QOS_CLASS_BACKGROUND
-		let backgroundQueue = dispatch_get_global_queue(qualityOfServiceClass, 0)
-		dispatch_async(backgroundQueue, {
+		let qualityOfServiceClass = DispatchQoS.QoSClass.background
+		let backgroundQueue = DispatchQueue.global(qos: qualityOfServiceClass)
+		backgroundQueue.async(execute: {
 			self.cpu6502.run()
 			
 		})
 	}
 	
-	private let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-	private let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedFirst.rawValue)
+	fileprivate let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
+	fileprivate let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
 	
-	func imageFromARGB32Bitmap(pixels:[PixelData], width:Int, height:Int)->UIImage {
+	func imageFromARGB32Bitmap(_ pixels:[PixelData], width:Int, height:Int)->UIImage {
 		let bitsPerComponent:UInt = 8
 		let bitsPerPixel:UInt = 32
 		
 		assert(pixels.count == Int(width * height))
 		
 		var data = pixels // Copy to mutable []
-		let providerRef = CGDataProviderCreateWithCFData(
-			NSData(bytes: &data, length: data.count * 4)
-		)
+        let providerRef = CGDataProvider(data: NSData(bytes: &data, length: data.count * MemoryLayout<PixelData>.size))
 		
-		let cgim = CGImageCreate(
-			width,
-			height,
-			Int(bitsPerComponent),
-			Int(bitsPerPixel),
-			width * 4,
-			rgbColorSpace,
-			bitmapInfo,
-			providerRef,
-			nil,
-			true,
-			CGColorRenderingIntent.RenderingIntentDefault
+		let cgim = CGImage(
+			width: width,
+			height: height,
+			bitsPerComponent: Int(bitsPerComponent),
+			bitsPerPixel: Int(bitsPerPixel),
+			bytesPerRow: width * 4,
+			space: rgbColorSpace,
+			bitmapInfo: bitmapInfo,
+			provider: providerRef!,
+			decode: nil,
+			shouldInterpolate: true,
+			intent: CGColorRenderingIntent.defaultIntent
 		)
-		return UIImage(CGImage: cgim!)
+		return UIImage(cgImage: cgim!)
 	}
 
-
-	
-	
-	func updateScreen(offset: Int) {
-		screenView.layer.magnificationFilter = kCAFilterNearest
+	func updateScreen(_ offset: Int) {
+		
 		let width = 32
 		let height = 32
 		let len = width * height
 		
 		var pixData = [PixelData]()
 		
-		for (var i = offset; i < offset+len; i++) {
+		for i in offset ..< offset+len {
 			let color = getRGBFor6502(cpu6502.ram[i])
 			let thePix = PixelData(a: 0xff, r: color.r, g: color.g, b: color.b)
 			pixData.append(thePix)
 		}
 		
-		dispatch_async(dispatch_get_main_queue(), { () -> Void in
+		DispatchQueue.main.async(execute: { () -> Void in
+            self.screenView.layer.magnificationFilter = kCAFilterNearest
 			self.screenView.image = self.imageFromARGB32Bitmap(pixData, width: width, height: height)
 		})
 		
@@ -136,7 +132,7 @@ class ViewController: UIViewController {
 		
 	}
 	
-	@IBAction func someButtonPressed(sender: UIButton) {
+	@IBAction func someButtonPressed(_ sender: UIButton) {
 		if sender == wButton {
 			cpu6502.inputKey("w")
 		}
@@ -154,8 +150,8 @@ class ViewController: UIViewController {
 		}
 	}
 	
-	func hardwareKeyPressed(sender: UIKeyCommand) {
-		cpu6502.inputKey(sender.input)
+	func hardwareKeyPressed(_ sender: UIKeyCommand) {
+		cpu6502.inputKey(sender.input!)
 	}
 	
 	

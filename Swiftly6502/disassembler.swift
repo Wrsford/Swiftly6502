@@ -8,7 +8,7 @@
 
 import Foundation
 
-func disassemble(data: [Int]) -> String {
+func disassemble(_ data: [Int]) -> String {
 	var currentAddr = 0
 	var toReturn = ""
 	while currentAddr < data.count {
@@ -41,7 +41,7 @@ func disassemble(data: [Int]) -> String {
 		} else {
 			toReturn += ".byte $" + data[currentAddr].hex() + "\n"
 			//print("ERROR DECOMPILING")
-			currentAddr++
+			currentAddr += 1
 		}
 		
 		

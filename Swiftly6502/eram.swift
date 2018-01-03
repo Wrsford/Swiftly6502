@@ -17,21 +17,21 @@ class eram {
 	var vramLocation = 0x200
 	var vramSize: Int
 	
-	private var memory : [Int]
+	fileprivate var memory : [Int]
 	
 	init(theName: String = "Emulated Ram") {
 		name = theName
-		memory = [Int](count: 0xFFFF, repeatedValue: 0) // Memory is 64KB
+		memory = [Int](repeating: 0, count: 0xFFFF) // Memory is 64KB
 		vramSize = gpu.screenHeight * gpu.screenWidth
 	}
 	
-	var stack = [Int](count: 256, repeatedValue: 0)
+	var stack = [Int](repeating: 0, count: 256)
 	
-	func loadData(data: [Int], startAddress addr: Int) {
+	func loadData(_ data: [Int], startAddress addr: Int) {
 		var off = addr
 		for i in data {
 			self[off] = i
-			off++
+			off += 1
 		}
 	}
 	
