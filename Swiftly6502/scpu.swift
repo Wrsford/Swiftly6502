@@ -47,7 +47,7 @@ extension String {
 	func removeComments(_ commentString: String) -> String {
 		let range = self.range(of: commentString)
 		if range != nil {
-			return self.substring(to: range!.lowerBound)
+			return String(self[..<range!.lowerBound])
 		}
 		return self
 	}
@@ -794,8 +794,6 @@ class scpu {
 		case InstructionGroups.slp: // SLP
 			usleep(useconds_t(M * 100000))
 			
-		default:
-			print("def")
 		}
 	}
 	
