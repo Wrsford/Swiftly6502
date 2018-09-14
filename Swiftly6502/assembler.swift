@@ -47,10 +47,9 @@ class assembler {
                 
                 let rangeOfEq = theLine.range(of: "[[:space:]]", options: NSString.CompareOptions.regularExpression, range: theLine.range(of: theLine), locale: nil)
                 if rangeOfEq != nil {
-                    let theDefinedString = theLine.substring(to: rangeOfEq!.lowerBound).remove6502CompilerExcess()
-                    // ALRIGHTY FUCKHEAD. I GOT UR GODDAMNED STRING
+                    let theDefinedString = String(theLine[..<rangeOfEq!.lowerBound]).remove6502CompilerExcess()
                     
-                    var theStringValue = theLine.substring(from: rangeOfEq!.upperBound).remove6502CompilerExcess()
+                    var theStringValue = String(theLine[rangeOfEq!.upperBound...]).remove6502CompilerExcess()
                     
                     var theValue: Int?
                     
@@ -122,7 +121,7 @@ class assembler {
 				// Replace the cmd code with blankness
 				let matchRange = ("   " + l.substringFromIndex(3)).range(of: "[0-9]{1,}", options: NSString.CompareOptions.regularExpression, range: l.range(of: l), locale: nil)
 				if matchRange != nil {
-					let theNum = Int(l.substring(with: matchRange!))
+					let theNum = Int(l[matchRange!])
 					
 					if theNum != nil {
 						lines.insert(l.replacingCharacters(in: matchRange!, with: "$" + theNum!.hex()), at: i)
@@ -133,7 +132,7 @@ class assembler {
 			} else {
 				let matchRange = ("   " + l.substringFromIndex(3)).range(of: "[0-9a-fA-F]{1,}", options: NSString.CompareOptions.regularExpression, range: l.range(of: l), locale: nil)
 				if matchRange != nil {
-					let theNum = Int(l.substring(with: matchRange!), radix:16)
+					let theNum = Int(l[matchRange!], radix:16)
 					
 					if theNum != nil {
 						lines.insert(l.replacingCharacters(in: matchRange!, with: theNum!.hex()), at: i)
@@ -270,7 +269,7 @@ class assembler {
 						
 						if range != nil {
 							var nextByte: Int
-							nextByte = Int(lineToParse.substring(with: range!), radix:16)!							
+							nextByte = Int(lineToParse[range!], radix:16)!
 							binary.insert(nextByte, at: insPnt-startAddr)
 						}
 					}
