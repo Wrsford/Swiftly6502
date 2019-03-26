@@ -651,7 +651,7 @@ class scpu {
 			P.Z = (M==0) ? 1:0
 			
 		case InstructionGroups.nop: // NOP
-			true
+			break
 			
 		case InstructionGroups.ora: // ORA
 			//print("ORA")

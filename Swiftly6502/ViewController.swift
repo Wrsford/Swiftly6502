@@ -124,7 +124,7 @@ class ViewController: UIViewController {
 		}
 		
 		DispatchQueue.main.async(execute: { () -> Void in
-            self.screenView.layer.magnificationFilter = kCAFilterNearest
+            self.screenView.layer.magnificationFilter = CALayerContentsFilter.nearest
 			self.screenView.image = self.imageFromARGB32Bitmap(pixData, width: width, height: height)
 		})
 		
